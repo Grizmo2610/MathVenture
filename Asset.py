@@ -18,7 +18,6 @@ class Player:
         self.point = 0
         self.speed = self.distance * self.dt
 
-    
     def up(self):
         self.y -= self.speed
     
