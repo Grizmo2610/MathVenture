@@ -4,46 +4,64 @@ from Asset import Player
 from GameMap import MapGame
 from GameMap import game_maps
 
+# Init pygame
 pygame.init()
 
+# paths
+block_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/props/block-big.png" 
+background_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/layers/back.png" 
+icon_path = "assets/Logo/3.png"
+player_path = "./assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle/player-idle-3.png"
+
+
+# Load image
+background = pygame.image.load(background_path)
+block = pygame.image.load(block_path)
+icon = pygame.image.load(icon_path)
+origin = pygame.image.load(player_path)
+
+# Srceen 
 screen_width = 1280
 screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height))
-clock = pygame.time.Clock()
-running  = True
 
-right_bound = screen_width - 40
-bottom_bound = screen_height - 40
+# Setup
+pygame.display.set_caption("HAMIC MathVentrue")
+pygame.display.set_icon(icon)
 
-# paths
-block_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/props/block-big.png"
-background_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/layers/back.png"
+# Background
+background = pygame.transform.scale(background, (screen_width, screen_height))
 
-background = pygame.image.load(background_path)
-block = pygame.image.load(block_path)
+# Variable
+clock = pygame.time.Clock() 
+FPS = 120
 
-# Map setup
-
+## Screen bound
+right_bound = screen_width - 40 
+bottom_bound = screen_height - 40 
 
 # Player setup
 
-dt = 0
+## Player variable
+dt = clock.tick(FPS) / 1000
 distance = 300
 
-origin = pygame.image.load("./assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle/player-idle-3.png")
+# Setup image
 player_left = origin
 player_right = pygame.transform.flip(player_left, True, False)
-player_image = player_right
+player_image = player_right # At first display
+
+# Init payer
 player = Player(screen.get_width() / 2, screen.get_height() / 2, dt, distance)
-
-# Transform asset
-background = pygame.transform.scale(background, (screen_width, screen_height))
-
 
 
 def draw_background(MapGame: MapGame):
+    """
+    This function draw background of game and all object in every game level
+    """
     screen.blit(background, (0,0))
 
+running  = True
 while running:
     # Quit game event
     for event in pygame.event.get():
@@ -58,38 +76,24 @@ while running:
 
     # if press Key
     keys = pygame.key.get_pressed()
-
-    # Move right - left
+    
+    # Move Up - Down
     if keys[pygame.K_w] or keys[pygame.K_UP]:
-        if (player.y - player.distance * player.dt >= 0):
-            player.y -= player.distance * player.dt
-        else:
-            player.y = 0
+        player.up()
     if keys[pygame.K_s] or  keys[pygame.K_DOWN]:
-        if player.y + player.distance * player.dt > bottom_bound:
-            player.y = bottom_bound
-        else:
-            player.y += player.distance * player.dt
+        player.down(bottom_bound)
             
-    # Move Up - down
+    # Move left - right
     if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        if (player.x - player.distance * player.dt < 0):
-            player.x = 0
-        else:
-            player.x -= player.distance * player.dt
+        player.left()   
         player_image = player_right
     if keys[pygame.K_d] or  keys[pygame.K_RIGHT]:
-        if player.x + player.distance * player.dt > right_bound:
-            player.x = right_bound
-        else:
-            player.x += player.distance * player.dt
+        player.right(right_bound)
         player_image = player_left
 
     # flip() the display to put your work on screen
     pygame.display.flip()
 
     # limits FPS to 60
-    # dt is delta time in seconds since last frame, used for framerate-
-    # independent physics.
-    player.dt = clock.tick(60) / 1000
+    player.dt = clock.tick(FPS) / 1000
 pygame.quit()

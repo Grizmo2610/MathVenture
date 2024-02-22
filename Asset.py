@@ -8,6 +8,7 @@ class Player:
             cls._instance.y = y
             cls._instance.dt = dt
             cls._instance.distance = distance
+
         return cls._instance
 
     def __init__(self, x: int = 0, y: int = 0, dt: float = 0, distance: float = 300) -> None:
@@ -17,18 +18,31 @@ class Player:
         self.distance = distance
         self.point = 0
         self.speed = self.distance * self.dt
+    
 
     def up(self):
-        self.y -= self.speed
+        if (self.y - self.speed < 0):
+            self.y = 0
+        else:
+            self.y -= self.speed
     
-    def down(self):
-        self.y += self.speed
+    def down(self, bound):
+        if (self.y + self.speed >= bound):
+            self.y = bound
+        else:
+            self.y += self.speed
     
     def left(self):
-        self.x -= self.speed
+        if (self.x - self.speed < 0):
+            self.x = 0
+        else:
+            self.x -= self.speed
     
-    def right(self):
-        self.x += self.speed
+    def right(self, bound):
+        if (self.x + self.speed >= bound):
+            self.x = bound
+        else:
+            self.x += self.speed
     
     def get_pos(self):
         return (self.x, self.y)
