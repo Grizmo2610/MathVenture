@@ -1,6 +1,6 @@
 import pygame
-from Asset import Map
 from random import randint
+from Asset import Player
 
 pygame.init()
 
@@ -12,36 +12,34 @@ running  = True
 
 right_bound = screen_width - 40
 bottom_bound = screen_height - 40
-dt = 0
 
 # paths
 block_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/props/block-big.png"
 
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 background = pygame.image.load("assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/layers/back.png")
 block = pygame.image.load(block_path)
 
 
-test = [[0] * 40 for i in range(22)]
+test_map = [[0] * 40 for i in range(22)]
 
 for i in range(22):
     for j in range(40):
         if randint(1, 100) == 6:
-            test[i][j] = 1
+            test_map[i][j] = 1
 
-map_1 = Map(test)
+dt = 0
+distance = 300
 
-
-
-origin = player_left = pygame.image.load("./assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle/player-idle-3.png")
+origin = pygame.image.load("./assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle/player-idle-3.png")
 player_left = origin
 player_right = pygame.transform.flip(player_left, True, False)
-
+player_image = player_right
+player = Player(screen.get_width() / 2, screen.get_height() / 2, dt, distance)
 
 # Transform asset
 background = pygame.transform.scale(background, (screen_width, screen_height))
 
-player = player_right
+
 
 def draw_background(map_background: list[list[int]]):
     screen.blit(background, (0,0))
@@ -57,39 +55,39 @@ while running:
             running = False
 
     # Drawing backgroud
-    draw_background(test)
+    draw_background(test_map)
 
     # Player start position
-    screen.blit(player, player_pos)
+    screen.blit(player_image, player.get_pos())
 
     # if press Key
     keys = pygame.key.get_pressed()
 
     # Move right - left
     if keys[pygame.K_w] or keys[pygame.K_UP]:
-        if (player_pos.y - 300 * dt >= 0):
-            player_pos.y -= 300 * dt
+        if (player.y - distance * dt >= 0):
+            player.y -= distance * dt
         else:
-            player_pos.y = 0
+            player.y = 0
     if keys[pygame.K_s] or  keys[pygame.K_DOWN]:
-        if player_pos.y + 300 * dt > bottom_bound:
-            player_pos.y = bottom_bound
+        if player.y + distance * dt > bottom_bound:
+            player.y = bottom_bound
         else:
-            player_pos.y += 300 * dt
+            player.y += distance * dt
             
     # Move Up - down
     if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        if (player_pos.x - 300 * dt < 0):
-            player_pos.x = 0
+        if (player.x - distance * dt < 0):
+            player.x = 0
         else:
-            player_pos.x -= 300 * dt
-        player = player_right
+            player.x -= distance * dt
+        player_image = player_right
     if keys[pygame.K_d] or  keys[pygame.K_RIGHT]:
-        if player_pos.x + 300 * dt > right_bound:
-            player_pos.x = right_bound
+        if player.x + distance * dt > right_bound:
+            player.x = right_bound
         else:
-            player_pos.x += 300 * dt
-        player = player_left
+            player.x += distance * dt
+        player_image = player_left
 
     # flip() the display to put your work on screen
     pygame.display.flip()
@@ -97,5 +95,5 @@ while running:
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
-    dt = clock.tick(60) / 1000
+    player.dt = clock.tick(60) / 1000
 pygame.quit()
