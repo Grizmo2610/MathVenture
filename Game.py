@@ -2,6 +2,7 @@ import pygame
 from Asset import Player
 from GameMap import MapGame
 from GameMap import game_maps
+import os
 
 # Init pygame
 pygame.init()
@@ -12,12 +13,14 @@ pygame.mixer.init()
 block_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/props/block-big.png" 
 background_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/layers/back.png" 
 icon_path = "assets/Logo/3.png"
+sprite_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle"
+player_image_paths = os.listdir(sprite_path)
 player_path = "./assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle/player-idle-3.png"
 background_music_path = "assets/sunny-land-files/Sunny-land-assets-files/Sound/platformer_level03.mp3"
 
 # Load media
 
-#@ Load image
+## Load image
 background = pygame.image.load(background_path)
 block = pygame.image.load(block_path)
 icon = pygame.image.load(icon_path)
@@ -38,23 +41,25 @@ pygame.display.set_icon(icon)
 # Background
 background = pygame.transform.scale(background, (screen_width, screen_height))
 
-# Variable
+# Constant
 clock = pygame.time.Clock() 
 FPS = 120
+moving_left = False
+moving_right = False
+running  = True
 
 ## Screen bound
 right_bound = screen_width - 40 
 bottom_bound = screen_height - 40 
 
 # Player setup
-
 ## Player variable
 dt = clock.tick(FPS) / 1000
 distance = 300
 
 ## Setup image
-player_left = origin
-player_right = pygame.transform.flip(player_left, True, False)
+player_right = origin
+player_left = pygame.transform.flip(player_right, True, False)
 player_image = player_right # At first display
 
 ## Init payer
@@ -76,42 +81,50 @@ def draw_background(mapGame: MapGame):
 
 def play_game(mapGame: MapGame, keys):
     global player_image
+    global moving_left
+    global moving_right
 
     # Drawing backgroud
     draw_background(mapGame)
 
     # Player start position
     screen.blit(player_image, player.get_pos())
-
-    # Move Up - Down
     if keys[pygame.K_w] or keys[pygame.K_UP]:
         player.up()
     if keys[pygame.K_s] or  keys[pygame.K_DOWN]:
         player.down(bottom_bound)
-    
     # Move left - right
     if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        player.left()   
-        player_image = player_right
+        player.left()
+        moving_left = True
+        moving_right = False
     if keys[pygame.K_d] or  keys[pygame.K_RIGHT]:
+        moving_left = False
+        moving_right = True
         player.right(right_bound)
-        player_image = player_left
-
-running  = True
+    
+       
 while running:
     # Quit game event
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+        
     # if press Key
     keys = pygame.key.get_pressed()
     
     play_game(game_maps[0], keys)
-
+    
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-    # limits FPS to 60
+    # limits FPS to 120
     player.dt = clock.tick(FPS) / 1000
+
+    # Change image of sprite
+    if moving_left:
+        player_image = player_left
+    elif moving_right:
+        player_image = player_right
+
 pygame.quit()
