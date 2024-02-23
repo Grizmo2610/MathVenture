@@ -1,3 +1,35 @@
+class MyObject:
+    def __init__(self, x: int, y: int) -> None:
+        self.x = x
+        self.y = y
+
+    def collide(self) -> None:
+        pass
+
+class Wall(MyObject):
+    def collide(self):
+        pass
+        
+
+class Point(MyObject):
+    def __init__(self, x: int, y: int, player, type_point: str, point: int = 0) -> None:
+        super().__init__(x, y)
+        self.type_point = type_point
+        self.point = point
+        self.player = player
+    
+    def collide(self):
+        if self.type_point == "*":
+            self.player.point *= self.point
+        elif self.type_point == "+":
+            self.player.point += self.point
+        elif self.type_point == "-":
+            self.player.point -= self.point
+        elif self.type_point == "/":
+            self.player.point /= self.point
+        elif self.type_point == "^":
+            self.player.point = self.player.point ** self.point
+
 class Player:
     _instance = None
 
@@ -10,6 +42,7 @@ class Player:
             cls._instance.distance = distance
 
         return cls._instance
+
 
     def __init__(self, x: int = 0, y: int = 0, dt: float = 0, distance: float = 300) -> None:
         self.x = x
@@ -46,3 +79,6 @@ class Player:
     
     def get_pos(self):
         return (self.x, self.y)
+    
+
+

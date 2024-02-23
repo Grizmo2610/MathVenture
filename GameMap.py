@@ -1,4 +1,8 @@
-class MapGame:
-    pass
+from Asset import MyObject
 
-game_maps = [MapGame(), MapGame()]
+class MapGame:
+
+    def __init__(self, obbjects : list[MyObject]) -> None:
+        pass
+
+game_maps = [MapGame([]), MapGame([])]
