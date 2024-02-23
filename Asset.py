@@ -1,3 +1,5 @@
+import pygame
+
 class MyObject:
     def __init__(self, x: int, y: int) -> None:
         self.x = x
@@ -40,6 +42,7 @@ class Player:
             cls._instance.y = y
             cls._instance.dt = dt
             cls._instance.distance = distance
+            cls._instance.rect = pygame.Rect(x, y, 32, 32)
 
         return cls._instance
 
@@ -51,6 +54,7 @@ class Player:
         self.distance = distance
         self.point = 0
         self.speed = self.distance * self.dt
+        self.rect = pygame.Rect(x, y, 32, 32)
     
 
     def up(self):
@@ -58,24 +62,28 @@ class Player:
             self.y = 0
         else:
             self.y -= self.speed
+            self.rect.y -= self.speed
     
     def down(self, bound):
         if (self.y + self.speed >= bound):
             self.y = bound
         else:
             self.y += self.speed
+            self.rect.y += self.speed
     
     def left(self):
         if (self.x - self.speed < 0):
             self.x = 0
         else:
             self.x -= self.speed
+            self.rect.x -= self.speed
     
     def right(self, bound):
         if (self.x + self.speed >= bound):
             self.x = bound
         else:
             self.x += self.speed
+            self.rect.x -= self.speed
     
     def get_pos(self):
         return (self.x, self.y)
