@@ -1,7 +1,6 @@
 import pygame
 from Asset import Player
-from GameMap import MapGame
-from GameMap import game_maps
+from GameMap import *
 import os
 
 # Init pygame
@@ -58,8 +57,8 @@ dt = clock.tick(FPS) / 1000
 distance = 300
 
 # Setup image
-player_right = origin
-player_left = pygame.transform.flip(player_right, True, False)
+player_left = origin
+player_right = pygame.transform.flip(player_left, True, False)
 player_image = player_right  # At first display
 
 # Init payer
@@ -72,67 +71,42 @@ screen.blit(background, (0, 0))
 # Play musix (-1 for looping music)
 pygame.mixer.music.play(-1)
 
-boxes = [pygame.Rect(100, 200, 50, 50),  # Vật thể không thể đi qua
-            pygame.Rect(300, 300, 50, 50),  # Vật thể có thể đi qua
-            ]
 def draw_background(mapGame: MapGame):
     """
     This function draw background of game and all object in every game level
     """
     screen.blit(background, (0, 0))
+    walls = mapGame.walls
+    for wall in walls:
+        # pygame.draw.rect(screen, (255, 255, 255), wall.rect)
+        screen.blit(block,(wall.rect.x, wall.rect.y))
 
     
-    
-    for box in boxes:
-        pygame.draw.rect(screen, "RED", box)
-
-
 def play_game(mapGame: MapGame, keys):
     global player_image
     global moving_left
     global moving_right
+    walls = mapGame.walls
 
     # Drawing backgroud
     draw_background(mapGame)
 
-
     # Player start position
     screen.blit(player_image, player.get_pos())
-    box = boxes[0]
 
-    if player.rect.colliderect(box):
-        # Xử lý va chạm
-        if player.rect.top < box.bottom and player.rect.bottom > box.top:
-            # Nếu nhân vật va chạm với vật thể từ trên hoặc dưới
-            if player.rect.left < box.right and player.rect.right > box.left:
-                # Nếu nhân vật đang ở bên trái vật thể
-                player.rect.right = box.left
-            elif player.rect.right > box.left and player.rect.left < box.right:
-                # Nếu nhân vật đang ở bên phải vật thể
-                player.rect.left = box.right
-        elif player.rect.left < box.right and player.rect.right > box.left:
-            # Nếu nhân vật va chạm với vật thể từ bên trái hoặc phải
-            if player.rect.top < box.bottom and player.rect.bottom > box.top:
-                # Nếu nhân vật đang ở phía trên vật thể
-                player.rect.bottom = box.top
-            elif player.rect.bottom > box.top and player.rect.top < box.bottom:
-                # Nếu nhân vật đang ở phía dưới vật thể
-                player.rect.top = box.bottom
-    else:
-        if keys[pygame.K_w] or keys[pygame.K_UP]:
-            player.up()
-        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-            player.down(bottom_bound)
-        # Move left - right
-        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            player.left()
-            moving_left = True
-            moving_right = False
-        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            moving_left = False
-            moving_right = True
-            player.right(right_bound)
-
+     # Move Up - Down
+    if keys[pygame.K_w] or keys[pygame.K_UP]:
+        #player.up()
+        player.move(0, -2, walls)  
+    if keys[pygame.K_s] or  keys[pygame.K_DOWN]:
+        player.move(0, 2, walls)
+    # Move left - right
+    if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+        player.move(-2, 0, walls)
+        player_image = player_right
+    if keys[pygame.K_d] or  keys[pygame.K_RIGHT]:
+        player.move(2, 0, walls)
+        player_image = player_left
 
 while running:
     # Quit game event
