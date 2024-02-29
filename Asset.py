@@ -42,7 +42,7 @@ class Player:
             cls._instance.y = y
             cls._instance.dt = dt
             cls._instance.distance = distance
-            cls._instance.rect = pygame.Rect(x - 6, y, 32, 32)
+            cls._instance.rect = pygame.Rect(x - 6, y, 32, 32) #Modify the square to match player icon
 
         return cls._instance
 
@@ -54,7 +54,7 @@ class Player:
         self.distance = distance
         self.point = 0
         self.speed = self.distance * self.dt
-        self.rect = pygame.Rect(x - 6, y, 32, 32)
+        self.rect = pygame.Rect(x - 6, y, 32, 32) #Modify the square to match player icon
     
 
     # def up(self):
