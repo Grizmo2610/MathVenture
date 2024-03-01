@@ -1,5 +1,5 @@
 import pygame
-from Asset import Player
+from Asset import *
 from GameMap import *
 import os
 
@@ -71,16 +71,33 @@ screen.blit(background, (0, 0))
 # Play musix (-1 for looping music)
 pygame.mixer.music.play(-1)
 
+
 def draw_background(mapGame: MapGame):
     """
     This function draw background of game and all object in every game level
     """
+    global pointer
+    global font
+    score = pointer.point
     screen.blit(background, (0, 0))
     walls = mapGame.walls
+    points = mapGame.points
     for wall in walls:
         # pygame.draw.rect(screen, (255, 255, 255), wall.rect)
         screen.blit(block,(wall.rect.x, wall.rect.y))
 
+    for point in points:
+        txt = font.render(point.type_point + str(point.point), (True), (225, 0, 0))
+        screen.blit(txt, (point.rect.x, point.rect.y))
+    pointer.calculation_collidision_point(points)
+    score = pointer.point
+    text = font.render("Score: " + str(score), (True), (225, 0, 0))
+    screen.blit(text, (100, 500))
+
+#init point
+pointer = Point(player)
+
+font = pygame.font.Font(None, 30)
     
 def play_game(mapGame: MapGame, keys):
     global player_image

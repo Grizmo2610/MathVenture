@@ -8,29 +8,45 @@ class MyObject:
     def collide(self) -> None:
         pass
 
-class Wall(MyObject):
-    def collide(self):
-        pass
-        
-
-class Point(MyObject):
-    def __init__(self, x: int, y: int, player, type_point: str, point: int = 0) -> None:
-        super().__init__(x, y)
-        self.type_point = type_point
-        self.point = point
+# class Wall(MyObject):
+#     def collide(self):
+#         pass
+class Point():
+    # def __init__(self, x: int, y: int, player, type_point: str, point: int = 0):
+    #     super().__init__(x, y)
+    def __init__(self, player):
+        # self.type_point = type_point
+        self.point = 0 #point
         self.player = player
+        self.is_calculated = False
     
-    def collide(self):
-        if self.type_point == "*":
-            self.player.point *= self.point
-        elif self.type_point == "+":
-            self.player.point += self.point
-        elif self.type_point == "-":
-            self.player.point -= self.point
-        elif self.type_point == "/":
-            self.player.point /= self.point
-        elif self.type_point == "^":
-            self.player.point = self.player.point ** self.point
+    def collide(self, type_point, point):
+        if type_point == "*":
+            self.point *= point # self.player.point
+        elif type_point == "+":
+            self.point += point
+        elif type_point == "-":
+            self.point -= point
+        elif type_point == "/":
+            self.point /= point
+        elif type_point == "^":
+            self.point = self.point ** point
+    
+    def calculation_collidision_point(self, points):
+        count_length = 0
+        for point in points:
+            if self.player.rect.colliderect(point.rect) and not self.is_calculated:
+                self.collide(point.type_point, point.point)
+                # self.result = point
+                self.is_calculated = True
+
+            elif not self.player.rect.colliderect(point.rect):
+                count_length += 1
+        print(count_length, len(points))
+        if count_length == len(points):
+            self.is_calculated = False
+        # self.collide(self, '+', 4)
+    
 
 class Player:
     _instance = None
@@ -42,8 +58,7 @@ class Player:
             cls._instance.y = y
             cls._instance.dt = dt
             cls._instance.distance = distance
-            cls._instance.rect = pygame.Rect(x - 6, y - 2, 32, 32) #Modify the square to match player icon
-
+            cls._instance.rect = pygame.Rect(x + 9, y + 15, 16, 16) #Modify the square to match player icon
         return cls._instance
 
 
@@ -54,8 +69,7 @@ class Player:
         self.distance = distance
         self.point = 0
         self.speed = self.distance * self.dt
-        self.rect = pygame.Rect(x - 6, y - 2, 32, 32) #Modify the square to match player icon
-    
+        self.rect = pygame.Rect(x + 9, y + 15, 16, 16) #Modify the square to match player icon
 
     # def up(self):
     #     if (self.y - self.speed < 0):
@@ -118,6 +132,5 @@ class Player:
                 if dy < 0: # Moving up; Hit the bottom side of the wall
                     self.rect.top = wall.rect.bottom
                     self.y = self.resy
-    
 
 
