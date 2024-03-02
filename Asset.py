@@ -1,13 +1,5 @@
 import pygame
 
-class MyObject:
-    def __init__(self, x: int, y: int) -> None:
-        self.x = x
-        self.y = y
-
-    def collide(self) -> None:
-        pass
-
 # class Wall(MyObject):
 #     def collide(self):
 #         pass
@@ -34,15 +26,21 @@ class Point():
     
     def calculation_collidision_point(self, points):
         count_length = 0
+        count = 0
+#        del_point = False
         for point in points:
+            # del_point = False
             if self.player.rect.colliderect(point.rect) and not self.is_calculated:
                 self.collide(point.type_point, point.point)
                 # self.result = point
                 self.is_calculated = True
-
             elif not self.player.rect.colliderect(point.rect):
                 count_length += 1
-        print(count_length, len(points))
+            # if del_point == False:
+            if point.is_once and self.player.rect.colliderect(point.rect):
+                    del points[count]
+            count += 1
+        #print(count_length, len(points))
         if count_length == len(points):
             self.is_calculated = False
         # self.collide(self, '+', 4)
@@ -69,35 +67,7 @@ class Player:
         self.distance = distance
         self.point = 0
         self.speed = self.distance * self.dt
-        self.rect = pygame.Rect(x + 9, y + 15, 16, 16) #Modify the square to match player icon
-
-    # def up(self):
-    #     if (self.y - self.speed < 0):
-    #         self.y = 0
-    #     else:
-    #         self.y -= self.speed
-    #         self.rect.y -= self.speed
-    
-    # def down(self, bound):
-    #     if (self.y + self.speed >= bound):
-    #         self.y = bound
-    #     else:
-    #         self.y += self.speed
-    #         self.rect.y += self.speed
-    
-    # def left(self):
-    #     if (self.x - self.speed < 0):
-    #         self.x = 0
-    #     else:
-    #         self.x -= self.speed
-    #         self.rect.x -= self.speed
-    
-    # def right(self, bound):
-    #     if (self.x + self.speed >= bound):
-    #         self.x = bound
-    #     else:
-    #         self.x += self.speed
-    #         self.rect.x -= self.speed
+        self.rect = pygame.Rect(x + 9, y + 15, 16, 16) # Modify the square to match player icon
     
     def get_pos(self):
         return (self.x, self.y)
@@ -132,5 +102,3 @@ class Player:
                 if dy < 0: # Moving up; Hit the bottom side of the wall
                     self.rect.top = wall.rect.bottom
                     self.y = self.resy
-
-

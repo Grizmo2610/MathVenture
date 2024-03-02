@@ -1,49 +1,52 @@
 import pygame
 
-class Wall(object):
+class Wall:
     def __init__(self, pos):
        self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
 
-class ProductBlock(object):
-    def __init__(self, pos, point):
+class ProductBlock:
+    def __init__(self, pos, point, is_once: bool):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "*"
         self.point = point
+        self.is_once = is_once
 
-class SumBlock(object):
-    def __init__(self, pos, point):
+class SumBlock:
+    def __init__(self, pos, point, is_once: bool):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "+"
         self.point = point
+        self.is_once = is_once
 
-class SignalBlock(object):
-    def __init__(self, pos, point):
+class SignalBlock:
+    def __init__(self, pos, point, is_once: bool):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "-"
         self.point = point
+        self.is_once = is_once
 
-class ExpBlock(object):
-    def __init__(self, pos, point):
+class ExpBlock:
+    def __init__(self, pos, point, is_once: bool):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "^"
         self.point = point
-
-class QuotientBlock(object):
-    def __init__(self, pos, point):
+        self.is_once = is_once
+class QuotientBlock:
+    def __init__(self, pos, point, is_once: bool):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "/"
         self.point = point
-
+        self.is_once = is_once
 class MapGame:
     walls = []
     points = []
     level = [
     ["W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W"],
-    ["W", "*12", " ", "*", " ", "-99", " ", "^", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W"],
-    ["W", " ", " ", " ", " ", " ", "*", " ", " ", " ", "W", "W", "W", "W", "W", "W", " ", " ", " ", "W"],
+    ["W", "*12*True", " ", " ", " ", "-99-True", " ", "^3^False", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W"],
+    ["W", " ", " ", " ", " ", " ", " ", " ", " ", " ", "W", "W", "W", "W", "W", "W", " ", " ", " ", "W"],
     ["W", " ", " ", " ", "W", "W", "W", "W", " ", " ", " ", " ", " ", " ", " ", "W", " ", " ", " ", "W"],
     ["W", " ", " ", " ", "W", " ", " ", " ", " ", " ", " ", " ", " ", "W", "W", "W", "W", " ", " ", "W"],
-    ["W", " ", "W", "W", "W", " ", " ", "W", "W", "W", "W", " ", " ", " ", "+12", " ", " ", " ", " ", "W"],
+    ["W", " ", "W", "W", "W", " ", " ", "W", "W", "W", "W", " ", " ", " ", "+12+False", " ", " ", " ", " ", "W"],
     ["W", " ", " ", " ", "W", " ", " ", " ", " ", " ", "W", " ", " ", " ", " ", " ", " ", " ", " ", "W"],
     ["W", " ", " ", " ", "W", " ", " ", " ", " ", " ", "W", " ", " ", " ", "W", "W", "W", " ", "W", "W"],
     ["W", " ", " ", " ", "W", "W", "W", " ", "W", "W", "W", " ", " ", " ", "W", " ", "W", " ", " ", "W"],
@@ -56,14 +59,14 @@ class MapGame:
     ]
 
     start = 255
-    def str_to_int(point_type, inStr):
-        s = inStr.split(point_type)[1]
-        point = 1
-        if s != '':
-            point = int(s)
-        return point
-    def __init__(self) -> None:
-        
+    # def str_to_int(point_type, inStr):
+    #     s = inStr.split(point_type)[1]
+    #     point = 1
+    #     if s != '':
+    #         point = int(s)
+    #     return point
+    def __init__(self, target):
+        self.target = target
         x = self.start
         y = 100
         for row in self.level:
@@ -75,33 +78,37 @@ class MapGame:
                     s = col.split("*")[1]
                     if s != '':
                         point = int(s)
-                    self.points.append(ProductBlock((x, y), point))
+                    is_once = eval(col.split("*")[2])
+                    self.points.append(ProductBlock((x, y), point, is_once))
                 elif col[0] == "-":
                     point = 0
                     s = col.split("-")[1]
                     if s != '':
                         point = int(s)
-                    self.points.append(SignalBlock((x, y), point))
+                    is_once = eval(col.split("-")[2])
+                    self.points.append(SignalBlock((x, y), point, is_once))
                 elif col[0] == "+":
                     point = 0
                     s = col.split("+")[1]
                     if s != '':
                         point = int(s)
-                    self.points.append(SumBlock((x, y), point))
+                    is_once = eval(col.split("+")[2])
+                    self.points.append(SumBlock((x, y), point, is_once))
                 elif col[0] == "^":
                     point = 1
                     s = col.split("^")[1]
                     if s != '':
                         point = int(s)
-                    self.points.append(ExpBlock((x, y), point))
+                    is_once = eval(col.split("^")[2])
+                    self.points.append(ExpBlock((x, y), point, is_once))
                 elif col[0] == "/":
                     point = 1
                     s = col.split("/")[1]
                     if s != '':
                         point = int(s)
-                    self.points.append(QuotientBlock((x, y), point))
+                    is_once = eval(col.split("/")[2])
+                    self.points.append(QuotientBlock((x, y), point, is_once))
                 x += 32
             y += 32
             x = self.start
-
-game_maps = [MapGame(), MapGame()]
+game_maps = [MapGame(250), MapGame(250)]
