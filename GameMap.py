@@ -4,35 +4,36 @@ class Wall:
     def __init__(self, pos):
        self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
 
-class ProductBlock:
-    def __init__(self, pos, point, is_once: bool):
+class ProductBlock(object):
+    def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "*"
         self.point = point
         self.is_once = is_once
 
-class SumBlock:
-    def __init__(self, pos, point, is_once: bool):
+class SumBlock(object):
+    def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "+"
         self.point = point
         self.is_once = is_once
 
-class SignalBlock:
-    def __init__(self, pos, point, is_once: bool):
+class SignalBlock(object):
+    def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "-"
         self.point = point
         self.is_once = is_once
 
-class ExpBlock:
-    def __init__(self, pos, point, is_once: bool):
+class ExpBlock(object):
+    def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "^"
         self.point = point
         self.is_once = is_once
-class QuotientBlock:
-    def __init__(self, pos, point, is_once: bool):
+
+class QuotientBlock(object):
+    def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "/"
         self.point = point
@@ -59,14 +60,14 @@ class MapGame:
     ]
 
     start = 255
-    # def str_to_int(point_type, inStr):
-    #     s = inStr.split(point_type)[1]
-    #     point = 1
-    #     if s != '':
-    #         point = int(s)
-    #     return point
-    def __init__(self, target):
-        self.target = target
+    def str_to_int(point_type, inStr):
+        s = inStr.split(point_type)[1]
+        point = 1
+        if s != '':
+            point = int(s)
+        return point
+    def __init__(self) -> None:
+        
         x = self.start
         y = 100
         for row in self.level:
@@ -111,4 +112,5 @@ class MapGame:
                 x += 32
             y += 32
             x = self.start
-game_maps = [MapGame(250), MapGame(250)]
+
+game_maps = [MapGame(), MapGame()]
