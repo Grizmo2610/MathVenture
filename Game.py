@@ -47,9 +47,6 @@ moving_left = False
 moving_right = False
 running = True
 
-# Screen bound
-right_bound = screen_width - 40
-bottom_bound = screen_height - 40
 
 # Player setup
 # Player variable
@@ -75,15 +72,19 @@ pygame.mixer.music.play(-1)
 #init point
 pointer = Point(player)
 
-font = pygame.font.Font(None, 30)
-
 def draw_background(mapGame: MapGame):
     """
     This function draw background of game and all object in every game level
     """
     screen.blit(background, (0, 0))
-    walls = mapGame.walls
-    points = mapGame.points
+    global walls
+    global points
+    global first
+    if first:
+        first = False
+        walls = mapGame.walls.copy()
+        points = mapGame.points.copy()
+
     for wall in walls:
         screen.blit(block,(wall.rect.x, wall.rect.y))
 
@@ -95,14 +96,57 @@ def draw_background(mapGame: MapGame):
             pygame.draw.rect(screen, (0, 0, 0), point.rect)
         screen.blit(txt, (point.rect.x, point.rect.y))
     pointer.calculation_collidision_point(points)
-    text = font.render("Score: " + str(pointer.point), (True), (225, 0, 0))
-    screen.blit(text, (100, 500))
-    
+    score = font.render("Score: " + str(pointer.point), (True), (225, 0, 0))
+    screen.blit(score, (10, 10))
+
+
+
+def draw_text(text, font, text_col, x = 255, y = 255):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+
+def start():
+    global status
+    button = Button(0, 0, player_image, 1)
+    if button.draw(screen):
+        status = play_game
+
+
+def end(map_game: MapGame, keys):
+    # screen.blit(background, (0, 0))
+    default_status(map_game, keys)
+    pass
+
+def tutorial():
+    pass
+
+def main_menu():
+    pass
+
+def default_status(map_game: MapGame, keys):
+    global player_image
+    global status
+    global first
+
+    player_image = player_left
+    player.rect.x, player.rect.y = screen.get_width() / 2, screen.get_height() / 2
+    pointer.point = 0
+    draw_background(map_game)
+    screen.blit(player_image, player.get_pos())
+    first = True
+    status = play_game
+
+
 def play_game(mapGame: MapGame, keys):
     global player_image
     global moving_left
     global moving_right
-    walls = mapGame.walls
+    global status
+
+    walls = mapGame.walls.copy()
+
+    if (pointer.point < 0):
+        status = end
 
     # Drawing backgroud
     draw_background(mapGame)
@@ -125,6 +169,22 @@ def play_game(mapGame: MapGame, keys):
         player.move(2, 0, walls)
         moving_right = True
         moving_left = False
+    
+    # limits FPS to 120
+    player.dt = clock.tick(FPS) / 1000
+
+    # Change image of sprite
+    if moving_left:
+        player_image = player_left
+    elif moving_right:
+        player_image = player_right
+
+# Game status
+status = start
+walls = []
+points = []
+first = True
+font = pygame.font.Font(None, 30)
 
 # Main loop
 while running:
@@ -135,19 +195,13 @@ while running:
 
     # if press Key
     keys = pygame.key.get_pressed()
-
-    play_game(game_maps[0], keys)
+    
+    if status == start:
+        status()
+    else:
+        status(game_maps[0], keys)
 
     # flip() the display to put your work on screen
-    pygame.display.flip()
-
-    # limits FPS to 120
-    player.dt = clock.tick(FPS) / 1000
-
-    # Change image of sprite
-    if moving_left:
-        player_image = player_left
-    elif moving_right:
-        player_image = player_right
+    pygame.display.update()
 
 pygame.quit()

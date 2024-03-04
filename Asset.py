@@ -1,13 +1,7 @@
 import pygame
 
-# class Wall(MyObject):
-#     def collide(self):
-#         pass
-class Point():
-    # def __init__(self, x: int, y: int, player, type_point: str, point: int = 0):
-    #     super().__init__(x, y)
+class Point:
     def __init__(self, player):
-        # self.type_point = type_point
         self.point = 0 #point
         self.player = player
         self.is_calculated = False
@@ -27,9 +21,7 @@ class Point():
     def calculation_collidision_point(self, points):
         count_length = 0
         count = 0
-#        del_point = False
         for point in points:
-            # del_point = False
             if self.player.rect.colliderect(point.rect) and not self.is_calculated:
                 self.collide(point.type_point, point.point)
                 # self.result = point
@@ -52,8 +44,6 @@ class Player:
     def __new__(cls, x: int = 0, y: int = 0, dt: float = 0, distance: float = 300):
         if (cls._instance is None):
             cls._instance = super(Player, cls).__new__(cls)
-            cls._instance.x = x
-            cls._instance.y = y
             cls._instance.dt = dt
             cls._instance.distance = distance
             cls._instance.rect = pygame.Rect(x + 9, y + 15, 16, 16) #Modify the square to match player icon
@@ -61,8 +51,6 @@ class Player:
 
 
     def __init__(self, x: int = 0, y: int = 0, dt: float = 0, distance: float = 300) -> None:
-        self.x = x
-        self.y = y
         self.dt = dt
         self.distance = distance
         self.point = 0
@@ -70,7 +58,7 @@ class Player:
         self.rect = pygame.Rect(x + 9, y + 15, 16, 16) # Modify the square to match player icon
     
     def get_pos(self):
-        return (self.x, self.y)
+        return (self.rect.x - 9, self.rect.y - 15)
     
     def move(self, dx, dy, walls):
         # Move each axis separately. Note that this checks for collisions both times.
@@ -81,10 +69,6 @@ class Player:
 
     def move_single_axis(self, dx, dy, walls):
         # Move the rect
-        self.resx = self.x
-        self.resy = self.y
-        self.x += dx
-        self.y += dy
         self.rect.x += dx
         self.rect.y += dy
          # If you collide with a wall, move out based on velocity
@@ -92,13 +76,38 @@ class Player:
             if self.rect.colliderect(wall.rect):
                 if dx > 0: # Moving right; Hit the left side of the wall
                     self.rect.right = wall.rect.left
-                    self.x = self.resx
                 if dx < 0: # Moving left; Hit the right side of the wall
                     self.rect.left = wall.rect.right
-                    self.x = self.resx
                 if dy > 0: # Moving down; Hit the top side of the wall
                     self.rect.bottom = wall.rect.top
-                    self.y = self.resy
                 if dy < 0: # Moving up; Hit the bottom side of the wall
                     self.rect.top = wall.rect.bottom
-                    self.y = self.resy
+
+#button class
+class Button():
+	def __init__(self, x, y, image, scale):
+		width = image.get_width()
+		height = image.get_height()
+		self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
+		self.rect = self.image.get_rect()
+		self.rect.topleft = (x, y)
+		self.clicked = False
+
+	def draw(self, surface):
+		action = False
+		#get mouse position
+		pos = pygame.mouse.get_pos()
+
+		#check mouseover and clicked conditions
+		if self.rect.collidepoint(pos):
+			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				self.clicked = True
+				action = True
+
+		if pygame.mouse.get_pressed()[0] == 0:
+			self.clicked = False
+
+		#draw button on screen
+		surface.blit(self.image, (self.rect.x, self.rect.y))
+
+		return action

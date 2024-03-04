@@ -1,38 +1,39 @@
 import pygame
 
+
 class Wall:
     def __init__(self, pos):
        self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
 
-class ProductBlock(object):
+class ProductBlock:
     def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "*"
         self.point = point
         self.is_once = is_once
 
-class SumBlock(object):
+class SumBlock:
     def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "+"
         self.point = point
         self.is_once = is_once
 
-class SignalBlock(object):
+class SignalBlock:
     def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "-"
         self.point = point
         self.is_once = is_once
 
-class ExpBlock(object):
+class ExpBlock:
     def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "^"
         self.point = point
         self.is_once = is_once
 
-class QuotientBlock(object):
+class QuotientBlock:
     def __init__(self, pos, point, is_once):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
         self.type_point = "/"
@@ -60,7 +61,7 @@ class MapGame:
     ]
 
     start = 255
-    def str_to_int(point_type, inStr):
+    def str_to_int(point_type, inStr: str):
         s = inStr.split(point_type)[1]
         point = 1
         if s != '':
