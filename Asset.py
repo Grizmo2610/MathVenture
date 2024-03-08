@@ -41,7 +41,7 @@ class Point:
 class Player:
     _instance = None
 
-    def __new__(cls, x: int = 0, y: int = 0, dt: float = 0, distance: float = 300):
+    def __new__(cls, x: int, y: int, dt: float, distance: float):
         if (cls._instance is None):
             cls._instance = super(Player, cls).__new__(cls)
             cls._instance.dt = dt

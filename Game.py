@@ -16,6 +16,9 @@ sprite_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/playe
 player_image_paths = os.listdir(sprite_path)
 player_path = "./assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle/player-idle-3.png"
 background_music_path = "assets/sunny-land-files/Sunny-land-assets-files/Sound/platformer_level03.mp3"
+finish_block = "assets/temp/finish.png"
+levels_path = "assets/Level"
+level_button_paths = os.listdir("assets/Level")
 
 # button path
 start_path = "assets/temp/Start.png"
@@ -29,13 +32,21 @@ background = pygame.image.load(background_path)
 block = pygame.image.load(block_path)
 icon = pygame.image.load(icon_path)
 origin = pygame.image.load(player_path)
+finish_image = pygame.image.load(finish_block)
+
+def load_image_button(path, scale = 0.1):
+    image = pygame.image.load(path)
+    return pygame.transform.scale(image, (image.get_width() * scale, image.get_height() * scale))
 
 # load button image
-buttons = {"Start": pygame.transform.scale(pygame.image.load(start_path), (1920 / 10, 1080 / 10)),
-          "Tutorial": pygame.transform.scale(pygame.image.load(tutorial_path), (1920 / 10, 1080 / 10)),
-          "Quit": pygame.transform.scale(pygame.image.load(quit_path),(1920 / 10, 1080 / 10) )
+buttons_images = {"Start": load_image_button(start_path),
+          "Tutorial": load_image_button(tutorial_path),
+          "Quit": load_image_button(quit_path)
           }
 
+# Load level button
+for i in range(len(level_button_paths)):
+    buttons_images.setdefault(f"level{i+1:02d}", load_image_button(levels_path + "/" + level_button_paths[i]))
 
 # Load music
 pygame.mixer.music.load(background_music_path)
@@ -85,7 +96,7 @@ pygame.mixer.music.play(-1)
 pointer = Point(player)
 
 
-def draw_background(mapGame: MapGame):
+def draw_background(map_game: MapGame):
     """
     This function draw background of game and all object in every game level
     """
@@ -95,8 +106,8 @@ def draw_background(mapGame: MapGame):
     global first
     if first:
         first = False
-        walls = mapGame.walls.copy()
-        points = mapGame.points.copy()
+        walls = map_game.walls.copy()
+        points = map_game.points.copy()
 
     for wall in walls:
         screen.blit(block, (wall.rect.x, wall.rect.y))
@@ -113,6 +124,7 @@ def draw_background(mapGame: MapGame):
     pointer.calculation_collidision_point(points)
     score = font.render("Score: " + str(pointer.point), (True), (225, 0, 0))
     screen.blit(score, (10, 10))
+    screen.blit(finish_image, (map_game.finish[0] * 32 + 255, map_game.finish[1] * 32 + 100))
 
 
 def draw_text(text, font, text_col, x=255, y=255):
@@ -120,16 +132,16 @@ def draw_text(text, font, text_col, x=255, y=255):
     screen.blit(text, (x, y))
 
 
-def start():
-    x = screen.get_width() / 2 - buttons['Start'].get_width() / 10 - 60
+def main_menu():
+    x = screen.get_width() / 2 - buttons_images['Start'].get_width() / 10 - 60
     y = 100
     global status
     global running
-    start_button = Button(x, 100, buttons["Start"], 1)
-    tutorial_button = Button(x, 300, buttons["Tutorial"], 1)
-    quit_button = Button(x, 500, buttons["Quit"], 1)
+    start_button = Button(x, y * 1, buttons_images["Start"], 1)
+    tutorial_button = Button(x, y * 3, buttons_images["Tutorial"], 1)
+    quit_button = Button(x, y * 5, buttons_images["Quit"], 1)
     if start_button.draw(screen):
-        status = play_game
+        status = level_game
     elif tutorial_button.draw(screen):
         status = tutorial
     elif quit_button.draw(screen):
@@ -137,18 +149,25 @@ def start():
 
 
 def end(map_game: MapGame, keys):
-    # screen.blit(background, (0, 0))
     default_status(map_game, keys)
     pass
 
-
-def tutorial():
+def tutorial(map_game: MapGame, keys):
     pass
 
+def level_game(map_game: MapGame, keys):
+    screen.blit(background, (0, 0))
+    global status
+    buttons = []
+    left = 300
+    up = 30
+    for i in range(5):
+        buttons.append(Button(left, i * 130 + up, buttons_images[f'level{2 * i + 1:02d}'], 1))
+        buttons.append(Button(left + 500, i * 130 + up, buttons_images[f'level{2 * i + 2:02d}'], 1))
 
-def main_menu():
-    pass
-
+    for button in buttons:
+        if (button.draw(screen)):
+            status = play_game
 
 def default_status(map_game: MapGame, keys):
     global player_image
@@ -156,31 +175,33 @@ def default_status(map_game: MapGame, keys):
     global first
 
     player_image = player_left
-    player.rect.x, player.rect.y = screen.get_width() / 2, screen.get_height() / 2
+    player.rect.x, player.rect.y = map_game.start
     pointer.point = 0
     draw_background(map_game)
     screen.blit(player_image, player.get_pos())
+    screen.blit(finish_image, map_game.finish)
     first = True
     status = play_game
 
 
-def play_game(mapGame: MapGame, keys):
+def play_game(map_game: MapGame, keys):
     global player_image
     global moving_left
     global moving_right
     global status
-
-    walls = mapGame.walls.copy()
+    if (first):
+        default_status(map_game, keys)
+    walls = map_game.walls.copy()
 
     if (pointer.point < 0):
         status = end
 
     # Drawing backgroud
-    draw_background(mapGame)
+    draw_background(map_game)
+    screen.blit(finish_image, map_game.finish)
 
     # Player start position
     screen.blit(player_image, player.get_pos())
-
     # Move Up - Down
     if keys[pygame.K_w] or keys[pygame.K_UP]:
         # player.up()
@@ -208,7 +229,7 @@ def play_game(mapGame: MapGame, keys):
 
 
 # Game status
-status = start
+status = main_menu
 walls = []
 points = []
 first = True
@@ -224,12 +245,11 @@ while running:
     # if press Key
     keys = pygame.key.get_pressed()
 
-    if status == start:
+    if status == main_menu:
         status()
     else:
         status(game_maps[0], keys)
 
-    # flip() the display to put your work on screen
-    pygame.display.update()
+    pygame.display.flip()
 
 pygame.quit()
