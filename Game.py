@@ -77,26 +77,41 @@ pointer = Point(player)
 
 font = pygame.font.Font(None, 30)
 
+#init level
+level = 0
+
 def draw_background(mapGame: MapGame):
     """
     This function draw background of game and all object in every game level
     """
+    global level
     screen.blit(background, (0, 0))
     walls = mapGame.walls
     points = mapGame.points
+    target = mapGame.target
     for wall in walls:
         screen.blit(block,(wall.rect.x, wall.rect.y))
-
+    pygame.draw.rect(screen, (0, 0, 0), player.rect)
     for point in points:
-        txt = font.render(point.type_point + str(point.point), (True), (225, 0, 0))
+        txt = font.render(point.type_point + str(point.point), (True), (225, 10, 10))
         if point.is_once == True:
             pygame.draw.circle(screen, (225, 225, 225), (point.rect.x + 16, point.rect.y + 16), 16)
         else:
-            pygame.draw.rect(screen, (0, 0, 0), point.rect)
+            pygame.draw.rect(screen, (0, 9, 66), point.rect)
         screen.blit(txt, (point.rect.x, point.rect.y))
     pointer.calculation_collidision_point(points)
+    
+    #update level
+    if pointer.point == target:
+        level += 1
+        # player.x = player.rect.x - 9
+        # player.y = player.rect.y - 15
+        pointer.point = 0
+        
     text = font.render("Score: " + str(pointer.point), (True), (225, 0, 0))
-    screen.blit(text, (100, 500))
+    target_str = font.render("Target: " + str(target), (True), (225, 225, 0))
+    screen.blit(target_str, (100, 620))
+    screen.blit(text, (100, 650))
     
 def play_game(mapGame: MapGame, keys):
     global player_image
@@ -136,7 +151,7 @@ while running:
     # if press Key
     keys = pygame.key.get_pressed()
 
-    play_game(game_maps[0], keys)
+    play_game(game_maps[level], keys)
 
     # flip() the display to put your work on screen
     pygame.display.flip()
