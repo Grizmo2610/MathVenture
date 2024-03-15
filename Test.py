@@ -1,1 +1,4 @@
-target = -324
+from GameMap import *
+import pygame
+
+print(len(level_3))
