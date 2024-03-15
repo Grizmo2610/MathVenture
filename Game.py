@@ -77,7 +77,7 @@ pointer = Point(player)
 font = pygame.font.Font(None, 30)
 
 #init level
-level = 3
+level = 0
 
 def draw_background(mapGame: MapGame):
     """
