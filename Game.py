@@ -16,7 +16,10 @@ sprite_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/playe
 player_image_paths = os.listdir(sprite_path)
 player_path = "./assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle/player-idle-3.png"
 background_music_path = "assets/sunny-land-files/Sunny-land-assets-files/Sound/platformer_level03.mp3"
-
+# path demo tree == menu
+tree_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/props/tree.png"
+cherry_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/cherry/cherry-2.png"
+gem_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/gem/gem-5.png"
 # Load media
 
 # Load image
@@ -74,45 +77,77 @@ pygame.mixer.music.play(-1)
 # init point
 pointer = Point(player)
 
-font = pygame.font.Font(None, 30)
-
+font = pygame.font.Font(None, 23)
+font_target = pygame.font.Font(None, 50)
 #init level
-level = 0
+level = 3
+
+font_chose = pygame.font.SysFont('comicsans', 40)
+text_chose = font_chose.render('Chose level', 1, (255, 255, 255))
+def chose_level():
+    pygame.draw.rect(screen, pygame.Color('pink'), pygame.Rect(140, 70, 1000, 600))
+    screen.blit(text_chose, (500, 100))
+    for i in range(3):
+        screen.blit(game_maps[i].level_img, (200 + 350 * i, 200))
+    for i in range(3, 5):
+        screen.blit(game_maps[i].level_img, (380 + 350 * (i - 3), 400))
+
+
+#update level
+def update_level():
+    global level
+    global game_maps
+    global pointer
+    global player
+    level += 1
+    pointer.point = 0
+    player.setlocation(screen.get_width()/2, screen.get_height()/2)
+    if level > 4:
+        level = 0
+        #resetgame_maps
+        game_maps = [MapGame(level_1, target_1, img_level[0]), MapGame(level_2, target_2, img_level[1]), 
+         MapGame(level_3, target_3, img_level[2]), MapGame(level_4, target_4, img_level[3]),
+         MapGame(level_5, target_5, img_level[4]), MapGame(level_6, target_6, img_level[5]), 
+         MapGame(level_7, target_7, img_level[6]), MapGame(level_8, target_8, img_level[7])]
 
 def draw_background(mapGame: MapGame):
     """
     This function draw background of game and all object in every game level
     """
     global level
+    global game_maps
     screen.blit(background, (0, 0))
     walls = mapGame.walls
     points = mapGame.points
     target = mapGame.target
+    #pygame.draw.rect(screen, (0, 0, 0), player.rect)
 
-    pygame.draw.rect(screen, (0, 0, 0), player.rect)
-
+    screen.blit(mapGame.level_img, (1000, 200))
+    # screen.blit(tree, (1100, 100))    
+    
     for wall in walls:
         screen.blit(block,(wall.rect.x, wall.rect.y))
     for point in points:
-        txt = font.render(point.type_point + str(point.point), (True), (225, 0, 0))
-        if point.is_once == True:
-            pygame.draw.circle(screen, (225, 225, 225),
-                               (point.rect.x + 16, point.rect.y + 16), 16)
+        txt = font.render(point.type_point + str(point.point), (True), pygame.Color('black'))
+        
+        if point.is_once:
+            pygame.draw.circle(screen, (225, 125, 225),
+                                (point.rect.x + 16, point.rect.y + 16), 16)
+            # screen.blit(gem, (point.rect.x, point.rect.y))
         else:
-            pygame.draw.rect(screen, (0, 9, 66), point.rect)
-        screen.blit(txt, (point.rect.x, point.rect.y))
+            pygame.draw.rect(screen, pygame.Color('green'), point.rect)
+            # screen.blit(cherry, (point.rect.x, point.rect.y))
+        screen.blit(txt, (point.rect.x + 1, point.rect.y + 10))
     pointer.calculation_collidision_point(points)
     
     if target == pointer.point:
-        level += 1
-        pointer.point = 0
-        player.setlocation(screen.get_width()/2, screen.get_height()/2)
-        print(player.rect.x, player.rect.y, player.x, player.y)
+        update_level()
     
-    target_str = font.render("Target: " + str(target), (True), (225, 225, 0))
-    text = font.render("Score: " + str(pointer.point), (True), (225, 0, 0))
+    target_str = font_target.render("Target: " + str(target), (True), (225, 225, 0))
+    text = font_target.render("Score: " + str(pointer.point), (True), (225, 0, 0))
     screen.blit(target_str, (100, 600))
     screen.blit(text, (100, 650))
+
 
     
 def play_game(mapGame: MapGame, keys):
@@ -143,10 +178,14 @@ def play_game(mapGame: MapGame, keys):
 
 while running:
     # Quit game event
+    mouse_x, mouse_y = pygame.mouse.get_pos()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if 1000 < mouse_x < 1000 + 1920/12 and 200 < mouse_y < 200 + 1080/12:
+                game_maps[level] = MapGame(levels[level], targets[level], img_level[level])
+                pointer.point = 0
     # if press Key
     keys = pygame.key.get_pressed()
 
