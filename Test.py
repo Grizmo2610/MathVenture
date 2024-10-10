@@ -1,32 +1,31 @@
 # import pygame
-# from GameMap import *
+# import numpy as np
 
 # pygame.init()
 
-# screen = pygame.display.set_mode((1280, 720))
+# screen = pygame.display.set_mode((500, 500), pygame.RESIZABLE)
 
-# runing = True
-# clock = pygame.time.Clock()
-# dt = clock.tick(120) / 1000
+# running = True
 
-# font_chose = pygame.font.SysFont('comicsans', 40)
-# text_chose = font_chose.render('Chose level', 1, (255, 255, 255))
-# def chose_level():
-#     pygame.draw.rect(screen, pygame.Color('pink'), pygame.Rect(140, 70, 1000, 600))
-#     screen.blit(text_chose, (500, 100))
-#     for i in range(3):
-#         screen.blit(game_maps[i].level_img, (200 + 350 * i, 200))
-#     for i in range(3, 5):
-#         screen.blit(game_maps[i].level_img, (380 + 350 * (i - 3), 400))
+# class Block:
+#     def __init__(self, x, y, width, height, data : str):
+#         self.x, self.y, self.width, self.height = x, y, width, height
+#         self.data = data
+#         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+    
+#     def visualizeBlock(self, screen):
+#         pygame.draw.rect(screen, pygame.Color('pink'), self.rect)
+#         font = pygame.font.Font('freesansbold.ttf',self.width//len(self.data))
+#         text = font.render(self.data, True, pygame.Color('black'))
+#         text_rect = text.get_rect(center=(self.x + self.width//2, self.y + self.height//2))
+#         screen.blit(text, text_rect)
 
-# print(game_maps[0].level_img.get_height(), game_maps[0].level_img.get_width())
-
-# # while runing:
-# #     for event in pygame.event.get():
-# #         if event.type == pygame.QUIT:
-# #             runing = False
-# #         # Create a font object
-# #     chose_level()
-# #     screen.blit(screen, (0, 0))
-# #     pygame.display.flip()
-# # pygame.quit()
+# block = Block(12, 12, 100, 110, "H")
+    
+# while running:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             running = False
+#     block.visualizeBlock(screen)
+#     pygame.display.flip()
+# pygame.quit()

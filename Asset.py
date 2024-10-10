@@ -38,6 +38,8 @@ class Point:
         # self.collide(self, '+', 4)
     
 
+    
+
 class Player:
     _instance = None
 
@@ -101,4 +103,43 @@ class Player:
                 if dy < 0: # Moving up; Hit the bottom side of the wall
                     self.rect.top = wall.rect.bottom
                     self.y = self.resy
+        
+    
+    def moveInMoveBlock(self, moveBlocks):
+        for moveBlock in moveBlocks:
+            if self.rect.colliderect(moveBlock.rect):
+                if moveBlock.direction == "^":
+                    self.up(moveBlock)
+                elif moveBlock.direction == "v":
+                    self.down(moveBlock)
+                elif moveBlock.direction == "<":
+                    self.left(moveBlock)
+                elif moveBlock.direction == ">":
+                    self.right(moveBlock)
+
+    
+    def up(self, moveBlock):
+        self.rect.bottom = moveBlock.rect.top
+        self.rect.x = moveBlock.rect.x
+        self.x = self.rect.left - 8
+        self.y = self.rect.top - 15
+
+    def down(self, moveBlock):
+        self.rect.top = moveBlock.rect.bottom
+        self.rect.x = moveBlock.rect.x
+        self.x = self.rect.left - 8
+        self.y = self.rect.top - 15
+    
+    def left(self, moveBlock):
+        self.rect.right = moveBlock.rect.left
+        self.rect.y = moveBlock.rect.y
+        self.x = self.rect.left - 8
+        self.y = self.rect.top - 15
+    
+    def right(self, moveBlock):
+        self.rect.left = moveBlock.rect.right
+        self.rect.y = moveBlock.rect.y
+        self.x = self.rect.left - 8
+        self.y = self.rect.top - 15
+
     
