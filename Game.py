@@ -8,27 +8,29 @@ pygame.init()
 # Init music
 pygame.mixer.init()
 
+# direction
+moves = ["Down", "Up", "Left", "Right"]
+
 # paths
-block_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/props/block-big.png"
-background_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/layers/back.png"
-icon_path = "assets/Logo/3.png"
-sprite_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle"
+block_points_path = {_ : "assets/PNG/block/point/move{}.png".format(_) for _ in range(1, 3)}
+wall_path = "assets/PNG/block/wall/block-big.png"
+move_blocks_path = {move : "assets/PNG/block/move/arow3{}.png".format(move) for move in moves}
+background_path = "assets/PNG/background/back.png"
+icon_path = "assets/PNG/Logo/3.png"
+sprite_path = "assets/PNG/player"
 player_image_paths = os.listdir(sprite_path)
-player_path = "./assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/player/idle/player-idle-3.png"
-background_music_path = "assets/sunny-land-files/Sunny-land-assets-files/Sound/platformer_level03.mp3"
-# path demo tree == menu
-tree_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/environment/props/tree.png"
-cherry_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/cherry/cherry-2.png"
-gem_path = "assets/sunny-land-files/Sunny-land-assets-files/PNG/sprites/gem/gem-5.png"
-# Load media
+player_path = "./assets/PNG/player/player-idle-3.png"
+background_music_path = "assets/Sound/platformer_level03.mp3"
+background_level_path = "assets/PNG/Level/Level.png"
 
 # Load image
 background = pygame.image.load(background_path)
-block = pygame.image.load(block_path)
+block = pygame.image.load(wall_path)
 icon = pygame.image.load(icon_path)
 origin = pygame.image.load(player_path)
-path_img_level = ['assets/level/' + str(_ + 1)  + '.png' for _ in range(9)]
-img_level = [pygame.image.load(path) for path in path_img_level]
+move_blocks = {path : pygame.image.load(move_blocks_path[path]) for path in move_blocks_path}
+point_blocks = {path : pygame.image.load(block_points_path[path]) for path in block_points_path}
+background_level = pygame.image.load(background_level_path)
 
 # Load music
 pygame.mixer.music.load(background_music_path)
@@ -94,24 +96,23 @@ game_maps = []
 #max_level
 maxLevel = 4
 
-font_chose = pygame.font.SysFont('comicsans', 40)
-text_chose = font_chose.render('Chose level', 1, (255, 255, 255))
-
 def init():
     for i in range(maxLevel):
         [target, map_level] = read_level(i + 1)
         targets.append(target)
         levels.append(map_level)
-        game_maps.append(MapGame(levels[i], targets[i], img_level[i]))
+        game_maps.append(MapGame(levels[i], targets[i]))
 
 
-def chose_level():
-    pygame.draw.rect(screen, pygame.Color('pink'), pygame.Rect(140, 70, 1000, 600))
-    screen.blit(text_chose, (500, 100))
-    for i in range(3):
-        screen.blit(game_maps[i].level_img, (200 + 350 * i, 200))
-    for i in range(3, 5):
-        screen.blit(game_maps[i].level_img, (380 + 350 * (i - 3), 400))
+# def chose_level():
+#     font_chose = pygame.font.SysFont('comicsans', 40)
+#     text_chose = font_chose.render('Chose level', 1, (255, 255, 255))
+#     pygame.draw.rect(screen, pygame.Color('pink'), pygame.Rect(140, 70, 1000, 600))
+#     screen.blit(text_chose, (500, 100))
+#     for i in range(3):
+#         screen.blit(game_maps[i].level_img, (200 + 350 * i, 200))
+#     for i in range(3, 5):
+#         screen.blit(game_maps[i].level_img, (380 + 350 * (i - 3), 400))
 
 def read_level(numStr):
     file = open('maps/level'+ str(numStr) +'.txt', 'r')
@@ -135,33 +136,35 @@ def update_level():
     player.setlocation(screen.get_width()/2, screen.get_height()/2)
     if level >= maxLevel:
         level = 0
-        game_maps = [MapGame(levels[_], targets[_], img_level[_]) for _ in range(maxLevel)]
+        game_maps = [MapGame(levels[_], targets[_]) for _ in range(maxLevel)]
 
 
 def draw_point_block(points, screen):
     for point in points:
         text = point.type_point + str(point.point)
-        font = pygame.font.Font(None, (32//len(text)) * len(text) - 4)
+        font = pygame.font.SysFont('comicsans', (20//len(text)*len(text)))
         txt = font.render(text, (True), pygame.Color('black'))
-        txt.get_rect(center=(point.rect.x + 32//len(text), point.rect.y + 32//len(text)))
+        text_rect = txt.get_rect(center=(point.rect.x + 32//2, point.rect.y + 32//2))
         if point.is_once:
-            pygame.draw.circle(screen, (225, 125, 225),
-                                (point.rect.x + 16, point.rect.y + 16), 16)
+            screen.blit(point_blocks[1], (point.rect.x, point.rect.y))
         else:
-            pygame.draw.rect(screen, pygame.Color('green'), point.rect)
-        screen.blit(txt, (point.rect.x + 1, point.rect.y + 10))
+            screen.blit(point_blocks[2], (point.rect.x, point.rect.y))
+        screen.blit(txt, text_rect)
 
 def draw_move_block(moveBloks, screen):
     for moveBlock in moveBloks:
-        text = str(moveBlock.direction)
-        text += text
-        font = pygame.font.Font(None, (32//len(text)) * len(text) - 4)
-        txt = font.render(text, (True), pygame.Color('black'))
-        txt.get_rect(center=(moveBlock.rect.x + 32//len(text), moveBlock.rect.y + 32//len(text)))
-        pygame.draw.rect(screen, pygame.Color('red'), moveBlock.rect)
-        screen.blit(txt, (moveBlock.rect.x + 1, moveBlock.rect.y + 10))
+        screen.blit(move_blocks[moveBlock.direction], (moveBlock.rect.x, moveBlock.rect.y))
 
-        
+def draw_level():
+    screen.blit(background_level, (1000, 200))
+    text = "Level: " + str(level + 1)
+    font = pygame.font.SysFont('comicsans', 50//len(text)*len(text))
+    txt = font.render(text, (True), (0, 0, 0))
+    text_rect = txt.get_rect(center=(1000 + 190//2, 200 + 102//2))
+    screen.blit(txt, text_rect)
+
+
+print(background_level.get_size())
 
 def draw_background(mapGame: MapGame):
     """
@@ -173,10 +176,9 @@ def draw_background(mapGame: MapGame):
     walls = mapGame.walls
     points = mapGame.points
     target = mapGame.target
-    #pygame.draw.rect(screen, (0, 0, 0), player.rect)
 
-    screen.blit(mapGame.level_img, (1000, 200))
-    # screen.blit(tree, (1100, 100))    
+    # screen.blit(mapGame.level_img, (1000, 200))
+    draw_level()
     # Draw wall
     for wall in walls:
         screen.blit(block,(wall.rect.x, wall.rect.y))
@@ -237,7 +239,7 @@ def main():
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if 1000 < mouse_x < 1000 + 1920/12 and 200 < mouse_y < 200 + 1080/12:
-                    game_maps[level] = MapGame(levels[level], targets[level], img_level[level])
+                    game_maps[level] = MapGame(levels[level], targets[level])
                     pointer.point = 0
         # if press Key
         keys = pygame.key.get_pressed()

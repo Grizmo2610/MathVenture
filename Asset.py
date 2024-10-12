@@ -108,13 +108,13 @@ class Player:
     def moveInMoveBlock(self, moveBlocks):
         for moveBlock in moveBlocks:
             if self.rect.colliderect(moveBlock.rect):
-                if moveBlock.direction == "^":
+                if moveBlock.direction == "Up":
                     self.up(moveBlock)
-                elif moveBlock.direction == "v":
+                elif moveBlock.direction == "Down":
                     self.down(moveBlock)
-                elif moveBlock.direction == "<":
+                elif moveBlock.direction == "Left":
                     self.left(moveBlock)
-                elif moveBlock.direction == ">":
+                elif moveBlock.direction == "Right":
                     self.right(moveBlock)
 
     
