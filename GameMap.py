@@ -47,7 +47,7 @@ class MoveBlock:
         pass
 
 class MapGame:
-    start = 255
+    start = 310
     def __init__(self, level, target):
         self.target = target
         self.level = level

@@ -1,1 +1,0 @@
-print(type(eval("False")))

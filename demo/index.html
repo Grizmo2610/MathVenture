@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pygame on Web</title>
+  <script src="https://cdn.jsdelivr.net/npm/pyodide@0.22.0/pyodide.js"></script>
+</head>
+<body>
+  <canvas id="myCanvas" width="300" height="300"></canvas>
+  <py-script>
+    import pygame
+    pygame.init()
+    screen = pygame.display.set_mode((300, 300))
+    running = True
+    while running:
+      for event in pygame.event.get():
+        if event.type   
+ == pygame.QUIT:
+          running = False
+      screen.fill((255, 255, 255))   
+
+      pygame.display.flip()
+  </py-script>
+  <script>
+    async function loadPyodide() {
+      pyodide = await loadPyodide({
+        indexURL: "https://cdn.jsdelivr.net/npm/pyodide@0.22.0/pyodide.js"
+      });
+      await pyodide.loadPackage(["pygame"]);
+    }
+    loadPyodide();
+  </script>
+</body>
+</html>

@@ -10,18 +10,20 @@ pygame.mixer.init()
 
 # direction
 moves = ["Down", "Up", "Left", "Right"]
+point_types = ['sum', 'multiply', 'minus', 'divide', 'pow']
 
 # paths
-block_points_path = {_ : "assets/PNG/block/point/move{}.png".format(_) for _ in range(1, 3)}
+block_points_path = {_ : "assets/PNG/block/point/{}.png".format(_) for _ in point_types}
+block_points_path_move1 = {_ : "assets/PNG/block/point/{}_move1.png".format(_) for _ in point_types}
 wall_path = "assets/PNG/block/wall/block-big.png"
 move_blocks_path = {move : "assets/PNG/block/move/arow3{}.png".format(move) for move in moves}
-background_path = "assets/PNG/background/back.png"
+background_path = "assets/PNG/background/background.png"
 icon_path = "assets/PNG/Logo/3.png"
 sprite_path = "assets/PNG/player"
 player_image_paths = os.listdir(sprite_path)
 player_path = "./assets/PNG/player/player-idle-3.png"
 background_music_path = "assets/Sound/platformer_level03.mp3"
-background_level_path = "assets/PNG/Level/Level.png"
+background_level_path = "assets/PNG/Level/BackLevel.png"
 
 # Load image
 background = pygame.image.load(background_path)
@@ -31,7 +33,7 @@ origin = pygame.image.load(player_path)
 move_blocks = {path : pygame.image.load(move_blocks_path[path]) for path in move_blocks_path}
 point_blocks = {path : pygame.image.load(block_points_path[path]) for path in block_points_path}
 background_level = pygame.image.load(background_level_path)
-
+point_blocks_move1 = {path : pygame.image.load(block_points_path_move1[path]) for path in block_points_path_move1}
 # Load music
 pygame.mixer.music.load(background_music_path)
 
@@ -81,8 +83,6 @@ pygame.mixer.music.play(-1)
 # init point
 pointer = Point(player)
 
-font = pygame.font.Font(None, 23)
-font_target = pygame.font.Font(None, 50)
 #init level
 level = 0
 
@@ -139,16 +139,40 @@ def update_level():
         game_maps = [MapGame(levels[_], targets[_]) for _ in range(maxLevel)]
 
 
+def draw_back_point(type_point, x, y):
+    if type_point == '+':
+        screen.blit(point_blocks['sum'], (x, y))
+    elif type_point == '*':
+        screen.blit(point_blocks['multiply'], (x, y))
+    elif type_point == '-':
+        screen.blit(point_blocks['minus'], (x, y))
+    elif type_point == '/':
+        screen.blit(point_blocks['divide'], (x, y))
+    elif type_point == '^':
+        screen.blit(point_blocks['pow'], (x, y))
+
+def draw_back_point_move1(type_point, x, y):
+    if type_point == '+':
+        screen.blit(point_blocks_move1['sum'], (x, y))
+    elif type_point == '*':
+        screen.blit(point_blocks_move1['multiply'], (x, y))
+    elif type_point == '-':
+        screen.blit(point_blocks_move1['minus'], (x, y))
+    elif type_point == '/':
+        screen.blit(point_blocks_move1['divide'], (x, y))
+    elif type_point == '^':
+        screen.blit(point_blocks_move1['pow'], (x, y))
+
 def draw_point_block(points, screen):
     for point in points:
-        text = point.type_point + str(point.point)
-        font = pygame.font.SysFont('comicsans', (20//len(text)*len(text)))
+        text = str(point.point)
+        font = pygame.font.Font(None, (30//len(text)*len(text)))
         txt = font.render(text, (True), pygame.Color('black'))
-        text_rect = txt.get_rect(center=(point.rect.x + 32//2, point.rect.y + 32//2))
+        text_rect = txt.get_rect(center=(point.rect.x + 30//2, point.rect.y + 32//2))
         if point.is_once:
-            screen.blit(point_blocks[1], (point.rect.x, point.rect.y))
+            draw_back_point_move1(point.type_point, point.rect.x, point.rect.y)
         else:
-            screen.blit(point_blocks[2], (point.rect.x, point.rect.y))
+            draw_back_point(point.type_point, point.rect.x, point.rect.y)
         screen.blit(txt, text_rect)
 
 def draw_move_block(moveBloks, screen):
@@ -156,15 +180,21 @@ def draw_move_block(moveBloks, screen):
         screen.blit(move_blocks[moveBlock.direction], (moveBlock.rect.x, moveBlock.rect.y))
 
 def draw_level():
-    screen.blit(background_level, (1000, 200))
+    x, y = 1000, 150
+    screen.blit(background_level, (x, y))
     text = "Level: " + str(level + 1)
     font = pygame.font.SysFont('comicsans', 50//len(text)*len(text))
-    txt = font.render(text, (True), (0, 0, 0))
-    text_rect = txt.get_rect(center=(1000 + 190//2, 200 + 102//2))
+    txt = font.render(text, (True), (225, 225, 225))
+    text_rect = txt.get_rect(center=(x + 230//2, y + 102//2))
     screen.blit(txt, text_rect)
 
-
-print(background_level.get_size())
+def draw_target_score(target):
+    x, y = 1000, 280
+    font = pygame.font.SysFont('comicsans', 40)
+    target_str = font.render("Target: " + str(target), (True), (225, 225, 0))
+    text = font.render("Score: " + str(pointer.point), (True), (225, 0, 0))
+    screen.blit(target_str, (x, y))
+    screen.blit(text, (x, y + 45))
 
 def draw_background(mapGame: MapGame):
     """
@@ -184,8 +214,9 @@ def draw_background(mapGame: MapGame):
         screen.blit(block,(wall.rect.x, wall.rect.y))
     
     draw_point_block(points, screen)
-    
+
     draw_move_block(mapGame.moveBloks, screen)
+    
     # pygame.draw.rect(screen, (0, 0, 0), player.rect)
     pointer.calculation_collidision_point(points)
     player.moveInMoveBlock(game_maps[level].moveBloks)
@@ -193,10 +224,11 @@ def draw_background(mapGame: MapGame):
     if target == pointer.point:
         update_level()
     
-    target_str = font_target.render("Target: " + str(target), (True), (225, 225, 0))
-    text = font_target.render("Score: " + str(pointer.point), (True), (225, 0, 0))
-    screen.blit(target_str, (100, 600))
-    screen.blit(text, (100, 650))
+    draw_target_score(target)
+    # target_str = font_target.render("Target: " + str(target), (True), (225, 225, 0))
+    # text = font_target.render("Score: " + str(pointer.point), (True), (225, 0, 0))
+    # screen.blit(target_str, (100, 600))
+    # screen.blit(text, (100, 650))
     
 def play_game(mapGame: MapGame, keys):
     global player_image
@@ -238,7 +270,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if 1000 < mouse_x < 1000 + 1920/12 and 200 < mouse_y < 200 + 1080/12:
+                if 1000 < mouse_x < 1000 + 1920/12 and 150 < mouse_y < 150 + 1080/12:
                     game_maps[level] = MapGame(levels[level], targets[level])
                     pointer.point = 0
         # if press Key
@@ -259,4 +291,5 @@ def main():
             player_image = player_right
     pygame.quit()
 
-main()
+if __name__ == '__main__':
+    main()
