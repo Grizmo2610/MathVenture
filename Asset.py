@@ -86,8 +86,8 @@ class Player:
         self.resy = self.y
         self.x += dx
         self.y += dy
-        self.rect.x += dx
-        self.rect.y += dy
+        self.rect.x = self.x + 8
+        self.rect.y = self.y + 15
          # If you collide with a wall, move out based on velocity
         for wall in walls:
             if self.rect.colliderect(wall.rect):

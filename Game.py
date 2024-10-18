@@ -51,7 +51,7 @@ background = pygame.transform.scale(background, (screen_width, screen_height))
 
 # Constant
 clock = pygame.time.Clock()
-FPS = 120
+FPS = 300
 moving_left = False
 moving_right = False
 running = True
@@ -71,8 +71,9 @@ player_right = pygame.transform.flip(player_left, True, False)
 player_image = player_right  # At first display
 
 # Init payer
-player = Player(screen.get_width() / 2, screen.get_height() / 2, dt, distance)
-
+xPlayer = screen.get_width() / 2 + 16
+yPlayer = screen.get_height() / 2
+player = Player(xPlayer, yPlayer, dt, distance)
 
 # Draw background at first
 screen.blit(background, (0, 0))
@@ -103,17 +104,6 @@ def init():
         levels.append(map_level)
         game_maps.append(MapGame(levels[i], targets[i]))
 
-
-# def chose_level():
-#     font_chose = pygame.font.SysFont('comicsans', 40)
-#     text_chose = font_chose.render('Chose level', 1, (255, 255, 255))
-#     pygame.draw.rect(screen, pygame.Color('pink'), pygame.Rect(140, 70, 1000, 600))
-#     screen.blit(text_chose, (500, 100))
-#     for i in range(3):
-#         screen.blit(game_maps[i].level_img, (200 + 350 * i, 200))
-#     for i in range(3, 5):
-#         screen.blit(game_maps[i].level_img, (380 + 350 * (i - 3), 400))
-
 def read_level(numStr):
     file = open('maps/level'+ str(numStr) +'.txt', 'r')
     data = []
@@ -133,7 +123,7 @@ def update_level():
     global maxLevel
     level += 1
     pointer.point = 0
-    player.setlocation(screen.get_width()/2, screen.get_height()/2)
+    player.setlocation(xPlayer, yPlayer)
     if level >= maxLevel:
         level = 0
         game_maps = [MapGame(levels[_], targets[_]) for _ in range(maxLevel)]
@@ -207,7 +197,6 @@ def draw_background(mapGame: MapGame):
     points = mapGame.points
     target = mapGame.target
 
-    # screen.blit(mapGame.level_img, (1000, 200))
     draw_level()
     # Draw wall
     for wall in walls:
@@ -217,7 +206,6 @@ def draw_background(mapGame: MapGame):
 
     draw_move_block(mapGame.moveBloks, screen)
     
-    # pygame.draw.rect(screen, (0, 0, 0), player.rect)
     pointer.calculation_collidision_point(points)
     player.moveInMoveBlock(game_maps[level].moveBloks)
     
@@ -225,10 +213,7 @@ def draw_background(mapGame: MapGame):
         update_level()
     
     draw_target_score(target)
-    # target_str = font_target.render("Target: " + str(target), (True), (225, 225, 0))
-    # text = font_target.render("Score: " + str(pointer.point), (True), (225, 0, 0))
-    # screen.blit(target_str, (100, 600))
-    # screen.blit(text, (100, 650))
+    # pygame.draw.rect(screen, (0, 0, 0), player.rect)
     
 def play_game(mapGame: MapGame, keys):
     global player_image
@@ -245,15 +230,15 @@ def play_game(mapGame: MapGame, keys):
      # Move Up - Down
     if keys[pygame.K_w] or keys[pygame.K_UP]:
         #player.up()
-        player.move(0, -2, walls)  
+        player.move(0, -3, walls)  
     if keys[pygame.K_s] or  keys[pygame.K_DOWN]:
-        player.move(0, 2, walls)
+        player.move(0, 3, walls)
     # Move left - right
     if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        player.move(-2, 0, walls)
+        player.move(-3, 0, walls)
         player_image = player_right
     if keys[pygame.K_d] or  keys[pygame.K_RIGHT]:
-        player.move(2, 0, walls)
+        player.move(3, 0, walls)
         player_image = player_left
 
 def main():
