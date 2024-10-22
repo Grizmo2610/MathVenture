@@ -241,6 +241,11 @@ def play_game(mapGame: MapGame, keys):
         player.move(3, 0, walls)
         player_image = player_left
 
+def reset_level():
+    game_maps[level] = MapGame(levels[level], targets[level])
+    pointer.point = 0
+    player.setlocation(xPlayer, yPlayer)
+
 def main():
     global running, level, game_maps, pointer, player, player_image
     global moving_left, moving_right, player_left, player_right
@@ -256,8 +261,7 @@ def main():
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if 1000 < mouse_x < 1000 + 1920/12 and 150 < mouse_y < 150 + 1080/12:
-                    game_maps[level] = MapGame(levels[level], targets[level])
-                    pointer.point = 0
+                    reset_level()
         # if press Key
         keys = pygame.key.get_pressed()
 
