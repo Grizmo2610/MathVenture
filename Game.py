@@ -71,7 +71,7 @@ player_right = pygame.transform.flip(player_left, True, False)
 player_image = player_right  # At first display
 
 # Init payer
-xPlayer = screen.get_width() / 2 + 45
+xPlayer = screen.get_width() / 2 + 48
 yPlayer = screen.get_height() / 2
 player = Player(xPlayer, yPlayer, dt, distance)
 
