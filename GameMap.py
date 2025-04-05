@@ -6,39 +6,39 @@ class Wall:
        self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
 
 class ProductBlock:
-    def __init__(self, pos, point, is_once):
+    def __init__(self, pos, point, isOnce):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
-        self.type_point = "*"
+        self.typePoint = "*"
         self.point = point
-        self.is_once = is_once
+        self.isOnce = isOnce
 
 class SumBlock:
-    def __init__(self, pos, point, is_once):
+    def __init__(self, pos, point, isOnce):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
-        self.type_point = "+"
+        self.typePoint = "+"
         self.point = point
-        self.is_once = is_once
+        self.isOnce = isOnce
 
 class SignalBlock:
-    def __init__(self, pos, point, is_once):
+    def __init__(self, pos, point, isOnce):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
-        self.type_point = "-"
+        self.typePoint = "-"
         self.point = point
-        self.is_once = is_once
+        self.isOnce = isOnce
 
 class ExpBlock:
-    def __init__(self, pos, point, is_once):
+    def __init__(self, pos, point, isOnce):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
-        self.type_point = "^"
+        self.typePoint = "^"
         self.point = point
-        self.is_once = is_once
+        self.isOnce = isOnce
 
 class QuotientBlock:
-    def __init__(self, pos, point, is_once):
+    def __init__(self, pos, point, isOnce):
         self.rect = pygame.Rect(pos[0], pos[1], 32, 32)
-        self.type_point = "/"
+        self.typePoint = "/"
         self.point = point
-        self.is_once = is_once
+        self.isOnce = isOnce
 
 class MoveBlock:
     def __init__(self, position, direction):
@@ -53,9 +53,14 @@ class MapGame:
         self.level = level
         self.points = []
         self.walls = []
-        self.moveBloks = []
-        x = self.start
-        y = 100
+        self.moveBlocks = []
+        self.x = self.start
+        self.y = 100
+        self.__detachLevel()
+        
+    def __detachLevel(self):
+        x = self.x
+        y = self.y
         for row in self.level:
             for col in row:
                 if col[0] == "*":
@@ -63,36 +68,36 @@ class MapGame:
                     s = col.split("*")[1]
                     if s != '':
                         point = int(s)
-                    is_once = eval(col.split("*")[2])
-                    self.points.append(ProductBlock((x, y), point, is_once))
+                    isOnce = eval(col.split("*")[2])
+                    self.points.append(ProductBlock((x, y), point, isOnce))
                 elif col[0] == "-":
                     point = 0
                     s = col.split("-")[1]
                     if s != '':
                         point = int(s)
-                    is_once = eval(col.split("-")[2])
-                    self.points.append(SignalBlock((x, y), point, is_once))
+                    isOnce = eval(col.split("-")[2])
+                    self.points.append(SignalBlock((x, y), point, isOnce))
                 elif col[0] == "+":
                     point = 0
                     s = col.split("+")[1]
                     if s != '':
                         point = int(s)
-                    is_once = eval(col.split("+")[2])
-                    self.points.append(SumBlock((x, y), point, is_once))
+                    isOnce = eval(col.split("+")[2])
+                    self.points.append(SumBlock((x, y), point, isOnce))
                 elif col[0] == "^":
                     point = 1
                     s = col.split("^")[1]
                     if s != '':
                         point = int(s)
-                    is_once = eval(col.split("^")[2])
-                    self.points.append(ExpBlock((x, y), point, is_once))
+                    isOnce = eval(col.split("^")[2])
+                    self.points.append(ExpBlock((x, y), point, isOnce))
                 elif col[0] == "/":
                     point = 1
                     s = col.split("/")[1]
                     if s != '':
                         point = int(s)
-                    is_once = eval(col.split("/")[2])
-                    self.points.append(QuotientBlock((x, y), point, is_once))
+                    isOnce = eval(col.split("/")[2])
+                    self.points.append(QuotientBlock((x, y), point, isOnce))
                 elif col[0] == "f":
                     self.finish = (x, y)
                 elif col[0] == "s":
@@ -100,16 +105,20 @@ class MapGame:
                 elif col[0] == '@':
                     # print("MoveBlock")
                     if col[1] == "U":
-                        self.moveBloks.append(MoveBlock((x, y), "Up"))
+                        self.moveBlocks.append(MoveBlock((x, y), "Up"))
                     elif col[1] == "D":
-                        self.moveBloks.append(MoveBlock((x, y), "Down"))
+                        self.moveBlocks.append(MoveBlock((x, y), "Down"))
                     elif col[1] == "L":
-                        self.moveBloks.append(MoveBlock((x, y), "Left"))
+                        self.moveBlocks.append(MoveBlock((x, y), "Left"))
                     elif col[1] == "R":
-                        self.moveBloks.append(MoveBlock((x, y), "Right"))
+                        self.moveBlocks.append(MoveBlock((x, y), "Right"))
 
                 elif col[0] == "W":
                     self.walls.append(Wall((x, y)))    
                 x += 32
             y += 32
             x = self.start
+    
+    def updateLevel(self, level, target):
+        self.level = level
+        self.__detachLevel()

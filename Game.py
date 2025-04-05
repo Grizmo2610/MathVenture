@@ -85,7 +85,7 @@ pygame.mixer.music.play(-1)
 pointer = Point(player)
 
 #init level
-level = 0
+currentLevelIdx = 0
 
 # targets
 targets = []
@@ -95,16 +95,18 @@ levels = []
 game_maps = []
 
 #max_level
-maxLevel = 4
+maxLevel = len(os.listdir('maps'))
+
+
 
 def init():
     for i in range(maxLevel):
-        [target, map_level] = read_level(i + 1)
+        target, map_level = readLevel(i + 1)
         targets.append(target)
         levels.append(map_level)
         game_maps.append(MapGame(levels[i], targets[i]))
 
-def read_level(numStr):
+def readLevel(numStr):
     file = open('maps/level'+ str(numStr) +'.txt', 'r')
     data = []
     target = int(file.readline())
@@ -112,73 +114,74 @@ def read_level(numStr):
         line = file.readline()
         data.append(line[:len(line) - 2].split(', '))
     
-    return [int(target), data]
+    return int(target), data
 
 #update level
-def update_level():
-    global level
+def updateLevel():
+    global currentLevelIdx
     global game_maps
     global pointer
     global player
     global maxLevel
-    level += 1
+    resetLevel()
+    currentLevelIdx = (currentLevelIdx + 1) % maxLevel
     pointer.point = 0
-    player.setlocation(xPlayer, yPlayer)
-    if level >= maxLevel:
-        level = 0
-        game_maps = [MapGame(levels[_], targets[_]) for _ in range(maxLevel)]
+    player.setLocation(xPlayer, yPlayer)
+    # if level >= maxLevel:
+    #     level = 0
+    #     game_maps = [MapGame(levels[_], targets[_]) for _ in range(maxLevel)]
 
 
-def draw_back_point(type_point, x, y):
-    if type_point == '+':
+def drawBackPoint(typePoint, x, y):
+    if typePoint == '+':
         screen.blit(point_blocks['sum'], (x, y))
-    elif type_point == '*':
+    elif typePoint == '*':
         screen.blit(point_blocks['multiply'], (x, y))
-    elif type_point == '-':
+    elif typePoint == '-':
         screen.blit(point_blocks['minus'], (x, y))
-    elif type_point == '/':
+    elif typePoint == '/':
         screen.blit(point_blocks['divide'], (x, y))
-    elif type_point == '^':
+    elif typePoint == '^':
         screen.blit(point_blocks['pow'], (x, y))
 
-def draw_back_point_move1(type_point, x, y):
-    if type_point == '+':
+def drawBackPoint_move1(typePoint, x, y):
+    if typePoint == '+':
         screen.blit(point_blocks_move1['sum'], (x, y))
-    elif type_point == '*':
+    elif typePoint == '*':
         screen.blit(point_blocks_move1['multiply'], (x, y))
-    elif type_point == '-':
+    elif typePoint == '-':
         screen.blit(point_blocks_move1['minus'], (x, y))
-    elif type_point == '/':
+    elif typePoint == '/':
         screen.blit(point_blocks_move1['divide'], (x, y))
-    elif type_point == '^':
+    elif typePoint == '^':
         screen.blit(point_blocks_move1['pow'], (x, y))
 
-def draw_point_block(points, screen):
+def drawPointBlock(points, screen):
     for point in points:
         text = str(point.point)
         font = pygame.font.Font(None, (30//len(text)*len(text)))
         txt = font.render(text, (True), pygame.Color('black'))
         text_rect = txt.get_rect(center=(point.rect.x + 30//2, point.rect.y + 32//2))
-        if point.is_once:
-            draw_back_point_move1(point.type_point, point.rect.x, point.rect.y)
+        if point.isOnce:
+            drawBackPoint_move1(point.typePoint, point.rect.x, point.rect.y)
         else:
-            draw_back_point(point.type_point, point.rect.x, point.rect.y)
+            drawBackPoint(point.typePoint, point.rect.x, point.rect.y)
         screen.blit(txt, text_rect)
 
-def draw_move_block(moveBloks, screen):
+def drawMoveBlock(moveBloks, screen):
     for moveBlock in moveBloks:
         screen.blit(move_blocks[moveBlock.direction], (moveBlock.rect.x, moveBlock.rect.y))
 
-def draw_level():
+def drawLevel():
     x, y = 1000, 150
     screen.blit(background_level, (x, y))
-    text = "Level: " + str(level + 1)
+    text = "Level: " + str(currentLevelIdx + 1)
     font = pygame.font.SysFont('comicsans', 50//len(text)*len(text))
     txt = font.render(text, (True), (225, 225, 225))
     text_rect = txt.get_rect(center=(x + 230//2, y + 102//2))
     screen.blit(txt, text_rect)
 
-def draw_target_score(target):
+def drawTargetScore(target):
     x, y = 1000, 280
     font = pygame.font.SysFont('comicsans', 40)
     target_str = font.render("Target: " + str(target), (True), (225, 225, 0))
@@ -186,46 +189,46 @@ def draw_target_score(target):
     screen.blit(target_str, (x, y))
     screen.blit(text, (x, y + 45))
 
-def draw_background(mapGame: MapGame):
+def drawBackground(mapGame: MapGame):
     """
     This function draw background of game and all object in every game level
     """
-    global level
+    global currentLevelIdx
     global game_maps
     screen.blit(background, (0, 0))
     walls = mapGame.walls
     points = mapGame.points
     target = mapGame.target
 
-    draw_level()
+    drawLevel()
     # Draw wall
     for wall in walls:
         screen.blit(block,(wall.rect.x, wall.rect.y))
     
-    draw_point_block(points, screen)
+    drawPointBlock(points, screen)
 
-    draw_move_block(mapGame.moveBloks, screen)
+    drawMoveBlock(mapGame.moveBlocks, screen)
     
-    pointer.calculation_collidision_point(points)
-    player.moveInMoveBlock(game_maps[level].moveBloks)
+    pointer.calculationCollisionPoint(points)
+    player.moveInMoveBlock(game_maps[currentLevelIdx].moveBlocks)
     
     if target == pointer.point:
-        update_level()
+        updateLevel()
     
-    draw_target_score(target)
+    drawTargetScore(target)
     # pygame.draw.rect(screen, (0, 0, 0), player.rect)
     
-def play_game(mapGame: MapGame, keys):
+def playGame(mapGame: MapGame, keys):
     global player_image
     global moving_left
     global moving_right
     walls = mapGame.walls
 
     # Drawing backgroud
-    draw_background(mapGame)
+    drawBackground(mapGame)
 
     # Player start position
-    screen.blit(player_image, player.get_pos())
+    screen.blit(player_image, player.getPos())
 
      # Move Up - Down
     if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -241,13 +244,25 @@ def play_game(mapGame: MapGame, keys):
         player.move(3, 0, walls)
         player_image = player_left
 
-def reset_level():
-    game_maps[level] = MapGame(levels[level], targets[level])
+def resetLevel():
+    # game_maps[level] = MapGame(levels[level], targets[level])
+    # _, levels[currentLevelIdx] = readLevel(currentLevelIdx + 1)
+    # game_maps[currentLevelIdx].level = levels[currentLevelIdx]
+    # game_maps[currentLevelIdx].updateLevel(levels[currentLevelIdx], targets[currentLevelIdx])
+    del game_maps[currentLevelIdx]
+    game_maps.insert(currentLevelIdx, MapGame(levels[currentLevelIdx], targets[currentLevelIdx]))
     pointer.point = 0
-    player.setlocation(xPlayer, yPlayer)
+    player.setLocation(xPlayer, yPlayer)
+
+def resetGame():
+    global currentLevelIdx
+    resetLevel()
+    currentLevelIdx = 0
+    pointer.point = 0
+    player.setLocation(xPlayer, yPlayer)
 
 def main():
-    global running, level, game_maps, pointer, player, player_image
+    global running, currentLevelIdx, game_maps, pointer, player, player_image
     global moving_left, moving_right, player_left, player_right
 
     
@@ -261,11 +276,11 @@ def main():
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if 1000 < mouse_x < 1000 + 1920/12 and 150 < mouse_y < 150 + 1080/12:
-                    reset_level()
+                    resetLevel()
         # if press Key
         keys = pygame.key.get_pressed()
 
-        play_game(game_maps[level], keys)
+        playGame(game_maps[currentLevelIdx], keys)
 
         # flip() the display to put your work on screen
         pygame.display.flip()

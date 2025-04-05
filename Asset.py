@@ -6,30 +6,30 @@ class Point:
         self.player = player
         self.is_calculated = False
     
-    def collide(self, type_point, point):
-        if type_point == "*":
+    def collide(self, typePoint: str, point):
+        if typePoint == "*":
             self.point *= point # self.player.point
-        elif type_point == "+":
+        elif typePoint == "+":
             self.point += point
-        elif type_point == "-":
+        elif typePoint == "-":
             self.point -= point
-        elif type_point == "/":
+        elif typePoint == "/":
             self.point /= point
-        elif type_point == "^":
+        elif typePoint == "^":
             self.point = self.point ** point
     
-    def calculation_collidision_point(self, points):
+    def calculationCollisionPoint(self, points: list):
         count_length = 0
         count = 0
         for point in points:
             if self.player.rect.colliderect(point.rect) and not self.is_calculated:
-                self.collide(point.type_point, point.point)
+                self.collide(point.typePoint, point.point)
                 # self.result = point
                 self.is_calculated = True
             elif not self.player.rect.colliderect(point.rect):
                 count_length += 1
             # if del_point == False:
-            if point.is_once and self.player.rect.colliderect(point.rect):
+            if point.isOnce and self.player.rect.colliderect(point.rect):
                     del points[count]
             count += 1
         #print(count_length, len(points))
@@ -64,23 +64,23 @@ class Player:
         self.speed = self.distance * self.dt
         self.rect = pygame.Rect(x + 8, y + 15, 16, 16)
 
-    def setlocation(self, x: int, y: int):
+    def setLocation(self, x: int, y: int):
         self.x = x
         self.y = y
         self.rect = pygame.Rect(x + 8, y + 15, 16, 16)
 
 
-    def get_pos(self):
+    def getPos(self):
         return (self.x, self.y)
     
     def move(self, dx, dy, walls):
         # Move each axis separately. Note that this checks for collisions both times.
         if dx != 0:
-            self.move_single_axis(dx, 0, walls)
+            self.moveSingleAxis(dx, 0, walls)
         if dy != 0:
-            self.move_single_axis(0, dy, walls)
+            self.moveSingleAxis(0, dy, walls)
 
-    def move_single_axis(self, dx, dy, walls):
+    def moveSingleAxis(self, dx, dy, walls):
         # Move the rect
         self.resx = self.x
         self.resy = self.y
