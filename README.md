@@ -17,6 +17,6 @@ The game does **not** auto-update.
 
 - **Moving Block Format**:  
   Use the format: `@Direction`  
-  Where `Direction` is one of the following: `Up`, `Down`, `Left`, `Right`  
-  Example: `@Up`  
+  Where `Direction` is one of the following: `Up`, `Down`, `Left`, `Right` | `U`, `D`, `L`, `R`  
+  Example: `@U`  
   This value will be displayed in the screen manager.
